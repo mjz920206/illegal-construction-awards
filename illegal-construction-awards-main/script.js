@@ -65,6 +65,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // --- Robust Copy-to-Clipboard Logic ---
+    function copyTextToClipboard(text, successCallback, errorCallback) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(successCallback, () => {
+                // Fallback for cases where clipboard API fails (e.g., in-app browsers)
+                fallbackCopyText(text, successCallback, errorCallback);
+            });
+        } else {
+            // Fallback for older browsers
+            fallbackCopyText(text, successCallback, errorCallback);
+        }
+    }
+
+    function fallbackCopyText(text, successCallback, errorCallback) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        
+        // Avoid scrolling to bottom
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                successCallback();
+            } else {
+                errorCallback();
+            }
+        } catch (err) {
+            errorCallback();
+        }
+        
+        document.body.removeChild(textArea);
+    }
+
     // --- Copy Template Logic ---
     const copySocialBtn = document.getElementById('copy-social-btn');
     const socialTextContainer = document.getElementById('social-media-template-text');
@@ -72,20 +112,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if(copySocialBtn && socialTextContainer) {
         copySocialBtn.addEventListener('click', () => {
             const textToCopy = socialTextContainer.innerText;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                copySocialBtn.innerText = '已复制！请粘贴到您的社交媒体！';
-                copySocialBtn.disabled = true;
-                setTimeout(() => {
-                    copySocialBtn.innerText = '一键复制所有文案';
-                    copySocialBtn.disabled = false;
-                }, 3000);
-            }).catch(err => {
-                console.error('复制失败: ', err);
-                copySocialBtn.innerText = '复制失败，请手动复制';
-                setTimeout(() => {
-                    copySocialBtn.innerText = '一键复制所有文案';
-                }, 3000);
-            });
+            copyTextToClipboard(textToCopy, 
+                () => { // Success
+                    copySocialBtn.innerText = '已复制！请粘贴到您的社交媒体！';
+                    copySocialBtn.disabled = true;
+                    setTimeout(() => {
+                        copySocialBtn.innerText = '一键复制所有文案';
+                        copySocialBtn.disabled = false;
+                    }, 3000);
+                },
+                () => { // Error
+                    console.error('复制失败');
+                    copySocialBtn.innerText = '复制失败，请手动复制';
+                }
+            );
         });
     }
 
@@ -95,20 +135,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if(copyComplaintBtn && complaintTextContainer) {
         copyComplaintBtn.addEventListener('click', () => {
             const textToCopy = complaintTextContainer.innerText;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                copyComplaintBtn.innerText = '已复制！';
-                copyComplaintBtn.disabled = true;
-                setTimeout(() => {
-                    copyComplaintBtn.innerText = '一键复制投诉模板';
-                    copyComplaintBtn.disabled = false;
-                }, 2000);
-            }).catch(err => {
-                console.error('复制失败: ', err);
-                copyComplaintBtn.innerText = '复制失败，请手动复制';
-                setTimeout(() => {
-                    copyComplaintBtn.innerText = '一键复制投诉模板';
-                }, 2000);
-            });
+            copyTextToClipboard(textToCopy, 
+                () => { // Success
+                    copyComplaintBtn.innerText = '已复制！';
+                    copyComplaintBtn.disabled = true;
+                    setTimeout(() => {
+                        copyComplaintBtn.innerText = '一键复制投诉模板';
+                        copyComplaintBtn.disabled = false;
+                    }, 2000);
+                },
+                () => { // Error
+                    console.error('复制失败');
+                    copyComplaintBtn.innerText = '复制失败，请手动复制';
+                }
+            );
         });
     }
 

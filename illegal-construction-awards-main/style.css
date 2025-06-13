@@ -437,6 +437,31 @@ section h3 {
     color: #2c7a7b;
 }
 
+.miniprogram-access {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2em;
+    flex-wrap: wrap;
+    margin-top: 1.5em;
+    padding: 1em;
+    background-color: #f0f7ff;
+    border-radius: 8px;
+}
+
+.qrcode-container {
+    text-align: center;
+}
+
+.qrcode-container img {
+    width: 120px;
+    height: 120px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    display: block;
+    margin: 0 auto 0.5em;
+}
+
 .gov-app-link {
     display: block;
     background-color: #28a745;
